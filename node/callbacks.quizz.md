@@ -56,11 +56,16 @@ const fs = require('fs');
 function readFileThenDo(next) {
   fs.readFile('./blah.nofile', (err, data) => {
     if (err) throw err;
-    next(data);
+    next(null, data);
   });
 }
 // Hint use try..catch
-readFileThenDo(data => {
-  console.log(data);
-});
+// ** Trick Question: try/catch needs synchronous code ***
+try {
+  readFileThenDo(data => {
+    console.log(data);
+  });
+} catch (err) {
+  console.error(err);
+}
 ```
