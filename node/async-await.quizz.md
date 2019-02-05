@@ -3,17 +3,28 @@
 Convert the promise version of the multi-file loader over to using async/await
 
 ```js
-const util = require("util");
-const fs = require("fs");
+const util = require('util');
+const fs = require('fs');
 const readFile = util.promisify(fs.readFile);
 
-const files = ["./files/demofile.txt", "./files/demofile.other.txt"];
+const files = ['./files/demofile.txt', './files/demofile.other.txt'];
 
-let promises = files.map(name => readFile(name, { encoding: "utf8" }));
-Promise.all(promises).then(values => {
-  // <-- Uses .all
-  console.log(values);
-});
+// let promises = files.map(name => readFile(name, { encoding: 'utf8' }));
+// Promise.all(promises).then(values => {
+//   // <-- Uses .all
+//   console.log(values);
+// });
+
+const asyncRead = async () => {
+  try {
+    const promises = files.map(name => readFile(name, { encoding: 'utf8' }));
+    const values = await Promise.all(promises);
+    console.log(values);
+  } catch (e) {
+    console.error('Read Error: ', e);
+  }
+};
+asyncRead();
 ```
 
 # Question 2
@@ -34,8 +45,8 @@ const fileIterator = files => ({
 
 (async () => {
   for await (let x of fileIterator([
-    "./files/demofile.txt",
-    "./files/demofile.other.txt"
+    './files/demofile.txt',
+    './files/demofile.other.txt'
   ])) {
     console.log(x);
   }
