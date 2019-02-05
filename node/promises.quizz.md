@@ -150,21 +150,35 @@ Create a process flow which publishes a file from a server, then realises the us
 
 ```js
 function authenticate() {
-  console.log("Authenticating");
+  console.log('Authenticating');
   return new Promise(resolve => setTimeout(resolve, 2000, { status: 200 }));
 }
 
 function publish() {
-  console.log("Publishing");
+  console.log('Publishing');
   return new Promise(resolve => setTimeout(resolve, 2000, { status: 403 }));
 }
 
 function timeout(sleep) {
-  return new Promise((resolve, reject) => setTimeout(reject, sleep, "timeout"));
+  return new Promise((resolve, reject) => setTimeout(reject, sleep, 'timeout'));
 }
 
-Promise.race( [publish(), timeout(3000)])
-  .then(...)
-  .then(...)
-  .catch(...);
+function safePublish() {
+  return publish().then(res => {
+    if (res.status === 403) {
+      return authenticate();
+    }
+    return res;
+  });
+}
+
+Promise.race([safePublish(), timeout(3000)])
+  .then(() => console.log('Published'))
+  .catch(err => {
+    if (err === 'timeout') {
+      console.error('Request timed out');
+    } else {
+      console.error(err);
+    }
+  });
 ```
