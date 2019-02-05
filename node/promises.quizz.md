@@ -60,6 +60,34 @@ readFile('./files/demofile.txt', 'utf-8').then(
 
 Convert the previous code so that it now chains the promise as well.
 
+```js
+const fs = require('fs');
+const zlib = require('zlib');
+
+function gzip(data) {
+  return new Promise((resolve, reject) => {
+    zlib.gzip(data, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
+function readFile(filename, encoding) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(filename, encoding, (err, data) => {
+      if (err) return reject(err);
+      resolve(data);
+    });
+  });
+}
+
+Promise.resolve(readFile('./files/demofile.txt', 'utf-8'))
+  .then(data => gzip(data))
+  .then(res => console.log(res))
+  .catch(err => console.error('Failed', err));
+```
+
 # Question 4
 
 Convert the previous code so that it now handles errors using the catch handler
