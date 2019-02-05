@@ -130,8 +130,16 @@ Create some code that tries to read from disk a file and times out if it takes l
 
 ```js
 function readFileFake(sleep) {
-  return new Promise(resolve => setTimeout(resolve, sleep));
+  return new Promise(resolve => setTimeout(resolve, sleep, 'read'));
 }
+
+function timeout(sleep) {
+  return new Promise((resolve, reject) => setTimeout(reject, sleep, 'timeout'));
+}
+
+Promise.race([readFileFake(5000), timeout(1000)])
+  .then(data => console.log(data))
+  .catch(err => console.error(err));
 
 readFileFake(5000); // This resolves a promise after 5 seconds, pretend it's a large file being read from disk
 ```
